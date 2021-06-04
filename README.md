@@ -1,6 +1,6 @@
 # go-redisq
 
-Simple Redis queue lib for golang backed by blocking list
+A very minimal Redis queuing library for Golang backed by blocking list in Redis.
 
 ## Usage :
 1. Declare queue:
