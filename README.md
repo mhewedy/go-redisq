@@ -24,6 +24,9 @@ Simple Redis queue lib for golang backed by blocking list
     
  	    // ..... process myDTO
  	
+ 	    // Note: the returned error will not be handled and will only be logged
+        // if you wish to implement special handling (log to db or so), then 
+        // you need to implement the logic yourself
  	    return nil
     }
     ```
