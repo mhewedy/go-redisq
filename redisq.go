@@ -42,11 +42,11 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 			}
 		}()
 
-		// waiting for qq.clientFn() to be available
-		// use to call the onMessage in the init, and when initialize the Redis client in
-		// the main function.
-		// so unless we wait here, the init function will be called before
-		// the main, and then the q.clientFn() (the redis client) will not be available
+		// waiting for q.clientFn() to be available (assigned).
+		//
+		// this introduced to make it okay to register HandlerFunc in packages init method
+		// as usually the redis client is being available in the main package
+		// which started after all package init methods are being executed.
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		for {
@@ -55,24 +55,25 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 			}
 		}
 
+		// start the listener loop
 		for {
 			var err error
 
 			result, err := q.clientFn().BLPop(context.Background(), 0*time.Second, q.Name).Result()
 			if err != nil {
-				logError(err)
+				panic(err)
 				return
 			}
 			if len(result) < 2 {
-				logError(fmt.Sprintf("redis result call doesn't return valid respones %s\n", result))
+				panic(fmt.Errorf("redis result call doesn't return valid respones %s\n", result))
 				return
 			}
 			if err = json.Unmarshal([]byte(result[1]), &messageType); err != nil {
-				logError(err)
+				panic(err)
 				return
 			}
 			if err = f(messageType); err != nil {
-				logError(fmt.Sprintf("HandlerFun error: %s\n", err))
+				panic(fmt.Errorf("HandlerFun error: %s\n", err))
 				return
 			}
 		}
@@ -80,5 +81,5 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 }
 
 func logError(err interface{}) {
-	_, _ = fmt.Fprintln(os.Stderr, "[go-redisq error]:", err)
+	_, _ = fmt.Fprintln(os.Stderr, "[go-redisq]:", err)
 }

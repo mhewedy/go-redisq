@@ -36,3 +36,5 @@ Simple Redis queue lib for golang backed by blocking list
         return err
     }
     ```
+## Run tests:
+To run tests, you need to start redis on `localhost:6379`
