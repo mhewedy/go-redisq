@@ -5,6 +5,8 @@ Simple Redis queue lib for golang backed by blocking list
 ## Usage :
 1. Declare queue:
     ```go
+    import "github.com/mhewedy/go-redisq"
+  
     var messagesQueue = redisq.NewQueue("messages.queue", func() *redis.Client {
         return redisClient // of type *redis.Client
     })
