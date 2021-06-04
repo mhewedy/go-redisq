@@ -17,16 +17,12 @@ Simple Redis queue lib for golang backed by blocking list
     }
 
     // the listener function:
-    func handleMessages(i interface{}, err error) {
+    func handleMessages(i interface{}) error {
+ 	    myDTO := i.(*MyDTO)
     
-    	if err != nil {
-    		log.Error(i, err)
-    		return
-    	}
-    
-    	myDto := i.(*MyDTO)
-    
-    	// .....
+ 	    // ..... process myDTO
+ 	
+ 	    return nil
     }
     ```
 3. Publish messages to the queue:

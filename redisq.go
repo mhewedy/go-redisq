@@ -14,7 +14,7 @@ type Queue struct {
 	clientFn func() *redis.Client
 }
 
-type HandlerFun func(i interface{}, err error)
+type HandlerFun func(i interface{}) error
 
 func NewQueue(name string, clientFn func() *redis.Client) *Queue {
 	return &Queue{Name: name, clientFn: clientFn}
@@ -37,7 +37,7 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 
 		defer func() {
 			if err := recover(); err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, "ERROR:", err)
+				logError(err)
 				go onMessage(q, f, messageType)
 			}
 		}()
@@ -59,14 +59,26 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 			var err error
 
 			result, err := q.clientFn().BLPop(context.Background(), 0*time.Second, q.Name).Result()
-			payload := result[1]
-
-			if err = json.Unmarshal([]byte(payload), &messageType); err != nil {
-				f(messageType, err)
+			if err != nil {
+				logError(err)
 				return
 			}
-
-			f(messageType, err)
+			if len(result) < 2 {
+				logError(fmt.Sprintf("redis result call doesn't return valid respones %s\n", result))
+				return
+			}
+			if err = json.Unmarshal([]byte(result[1]), &messageType); err != nil {
+				logError(err)
+				return
+			}
+			if err = f(messageType); err != nil {
+				logError(fmt.Sprintf("HandlerFun error: %s\n", err))
+				return
+			}
 		}
 	}()
+}
+
+func logError(err interface{}) {
+	_, _ = fmt.Fprintln(os.Stderr, "[go-redisq error]:", err)
 }
