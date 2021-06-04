@@ -61,7 +61,7 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 
 			result, err := q.clientFn().BLPop(context.Background(), 0*time.Second, q.Name).Result()
 			if err != nil {
-				panic(err)
+				panic(fmt.Errorf("%v (%v)", err, result))
 				return
 			}
 			if len(result) < 2 {
@@ -69,11 +69,11 @@ func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 				return
 			}
 			if err = json.Unmarshal([]byte(result[1]), &messageType); err != nil {
-				panic(err)
+				panic(fmt.Errorf("%v (%v)", err, result[1]))
 				return
 			}
 			if err = f(messageType); err != nil {
-				panic(fmt.Errorf("HandlerFun error: %s\n", err))
+				panic(fmt.Errorf("HandlerFun error: %v (%v)\n", err, result[1]))
 				return
 			}
 		}
