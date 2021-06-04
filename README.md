@@ -12,7 +12,7 @@ Simple Redis queue lib for golang backed by blocking list
 2. Register listener for the queue:
     ```go
     func init() {
- 	    // the qeueu object, the handler function and the message type
+ 	    // the queue object, the handler function and the message type
         redisq.OnMessage(messagesQueue, handleMessages, &MyDTO{})
     }
 
