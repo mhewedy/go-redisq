@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -22,18 +23,24 @@ func TestInvalidMessagePayload(t *testing.T) {
 		return redisClient
 	})
 
-	redisClient.RPush(context.Background(), "myqueue", "invalid payload")
-	_ = Publish(queue, "xyz")
-	_ = Publish(queue, msg{Data: "Hello"})
+	redisClient.RPush(context.Background(), "myqueue", "invalid payload") // error
+	_ = Publish(queue, "xyz")                                             // error
+	_ = Publish(queue, msg{Data: "Hello"})                                // success
+
+	var c = new(int)
 
 	OnMessage(queue, func(i interface{}) error {
 
 		data := i.(*msg).Data
 		fmt.Println("receiving: ", data)
 
+		*c++
+
 		return nil
 
 	}, &msg{})
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Second)
+
+	assert.Equal(t, 1, *c)
 }
