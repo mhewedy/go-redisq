@@ -35,6 +35,8 @@ func OnMessage(q *Queue, f HandlerFun, messageType interface{}) {
 func onMessage(q *Queue, f HandlerFun, messageType interface{}) {
 	func() {
 
+		// to handle panic cases from inside the HandlerFunc
+		// in such case, we start a new goroutine
 		defer func() {
 			if err := recover(); err != nil {
 				logError(err)
