@@ -23,6 +23,8 @@ func TestInvalidMessagePayload(t *testing.T) {
 	})
 
 	redisClient.RPush(context.Background(), "myqueue", "invalid payload")
+	_ = Publish(queue, "xyz")
+	_ = Publish(queue, msg{Data: "Hello"})
 
 	OnMessage(queue, func(i interface{}) error {
 
@@ -33,5 +35,5 @@ func TestInvalidMessagePayload(t *testing.T) {
 
 	}, &msg{})
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(10 * time.Second)
 }
