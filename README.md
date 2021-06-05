@@ -24,11 +24,10 @@ A very minimal queuing library for Golang backed by blocking list in Redis.
     
  	    // ..... process myDTO
  	
- 	    // Note: the returned error will not be handled and will only be logged.
-        //
-        // If you wish to implement special handling 
-        // (e.g. log to db or republish to the same queue or to a dl_queue),
-        // then you need to implement the logic yourself.
+ 	    // OnMessage calls the passed HandlerFunc
+        // and in case the HandlerFunc function returned an error,
+        // it logs the error to stdout and push the original message 
+        // to a queue with name <original_queue>.dl.queue
  	    return nil
     }
     ```
