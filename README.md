@@ -8,7 +8,7 @@ A very minimal queuing library for Golang backed by blocking list in Redis.
     import "github.com/mhewedy/go-redisq"
   
     var messagesQueue = redisq.NewQueue("messages.queue", func() *redis.Client {
-        return redisClient // of type *redis.Client
+        return redisClient // of type *redis.Client, could be null at time of registration but should be resolve to value before using the queue.
     })
     ```
 2. Register listener for the queue:
