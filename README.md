@@ -2,6 +2,11 @@
 
 A very minimal queuing library for Golang backed by blocking list in Redis.
 
+## Install:
+```bash
+go get github.com/mhewedy/go-redisq
+```
+
 ## Usage :
 1. Declare queue:
     ```go
