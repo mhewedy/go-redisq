@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"log"
 	"os"
 	"time"
 )
+
+var errorLog = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.Lshortfile)
 
 type Queue struct {
 	Name     string
@@ -97,5 +100,5 @@ func publishToDLQueue(q *Queue, result []string) {
 }
 
 func logError(err interface{}) {
-	_, _ = fmt.Fprintln(os.Stderr, "[go-redisq]:", err)
+	errorLog.Println("[go-redisq]:", err)
 }
